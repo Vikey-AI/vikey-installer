@@ -45,7 +45,9 @@ func main() {
 	failed := 0
 	fail := func(format string, a ...any) {
 		failed++
-		fmt.Printf("FAIL "+format+"\n", a...)
+		msg := fmt.Sprintf(format, a...)
+		fmt.Printf("FAIL %s\n", msg)
+		annotate(msg)
 	}
 	ctx := context.Background()
 	work, _ := os.MkdirTemp("", "vikey-e2e-")
@@ -157,4 +159,21 @@ func indent(b []byte) string {
 		out.WriteString("     " + l + "\n")
 	}
 	return out.String()
+}
+
+// annotate repeats a failure as a GitHub Actions error annotation, which
+// anyone can read on a public repository (job logs need admin rights).
+func annotate(msg string) {
+	if os.Getenv("GITHUB_ACTIONS") != "true" {
+		return
+	}
+	enc := strings.NewReplacer("%", "%25", "\r", "%0D", "\n", "%0A").Replace(tail(msg, 60))
+	fmt.Printf("::error title=e2e (%s)::%s\n", runtimeName(), enc)
+}
+
+func runtimeName() string {
+	if v := os.Getenv("RUNNER_OS"); v != "" {
+		return v
+	}
+	return "local"
 }

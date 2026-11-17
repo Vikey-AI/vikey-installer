@@ -13,19 +13,31 @@ on:
 permissions:
   contents: read
 
+# Failures are repeated as error annotations (.github/scripts/annotate-failure.sh):
+# job logs need admin rights to read, annotations are public.
+
 jobs:
   test:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
-      - run: go vet ./...
-      - run: go test ./...
+      - name: Vet and test
+        shell: bash
+        run: |
+          mkdir -p logs
+          go vet ./... 2>&1 | tee logs/test.log
+          go test ./... 2>&1 | tee -a logs/test.log
+      - name: Report failure
+        if: failure()
+        shell: bash
+        run: .github/scripts/annotate-failure.sh "test (${{ runner.os }})" logs/test.log
 
   # The one-line install exactly as a person runs it, on a real machine of
   # each OS: bootstrap script, vendor installers, setup, every agent answering
@@ -39,8 +51,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
 
@@ -63,9 +75,10 @@ jobs:
 
       - name: One-line install (macOS, Linux)
         if: runner.os != 'Windows'
+        shell: bash
         env:
           VIKEY_SETUP_ARGS: --yes --tools all
-        run: curl -fsSL http://127.0.0.1:18080/i/E2ETEST1 | sh
+        run: curl -fsSL http://127.0.0.1:18080/i/E2ETEST1 | sh 2>&1 | tee e2e/install.log
 
       # Windows PowerShell 5.1, what most people have.
       - name: One-line install (Windows)
@@ -73,7 +86,12 @@ jobs:
         shell: powershell
         env:
           VIKEY_SETUP_ARGS: --yes --tools all
-        run: irm http://127.0.0.1:18080/i/E2ETEST1.ps1 | iex
+        run: |
+          $out = irm http://127.0.0.1:18080/i/E2ETEST1.ps1 | iex *>&1 | Out-String
+          $code = $LASTEXITCODE
+          Write-Host $out
+          [IO.File]::WriteAllText("$PWD\e2e\install.log", $out)
+          if ($code -ne 0) { exit $code }
 
       - name: Agents answer through Vikey, doctor, uninstall
         shell: bash
@@ -84,6 +102,13 @@ jobs:
             vikey="$HOME/.vikey/bin/vikey"; check=e2e/e2echeck
           fi
           "$check" -mock http://127.0.0.1:18080 -vikey "$vikey"
+
+      - name: Report failure
+        if: failure()
+        shell: bash
+        run: |
+          .github/scripts/annotate-failure.sh "install (${{ runner.os }})" e2e/install.log
+          .github/scripts/annotate-failure.sh "mock requests (${{ runner.os }})" e2e/mock.log
 
       - name: Mock log
         if: always()

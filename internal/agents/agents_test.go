@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -94,7 +95,8 @@ func TestClaudeRoundTripKeepsUserSettings(t *testing.T) {
 	if got["modelOverrides"].(map[string]any)["claude-haiku-5-5"] != "mine" {
 		t.Fatal("user override lost")
 	}
-	if info, _ := os.Stat(path); info.Mode().Perm() != 0o600 {
+	// Windows has no Unix permission bits, files there always report 0666.
+	if info, _ := os.Stat(path); runtime.GOOS != "windows" && info.Mode().Perm() != 0o600 {
 		t.Fatalf("mode = %v", info.Mode().Perm())
 	}
 	if st := c.Inspect(context.Background(), Detection{}); !st.Configured || st.Model != "vikey/agent-coding" {
