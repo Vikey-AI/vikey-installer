@@ -1,0 +1,51 @@
+name: release
+
+# Push a tag like v0.1.0. The release holds the six binaries, checksums,
+# the bootstrap templates and release.json, which vikey-api's
+# scripts/sync-cli-release.js copies into the panel.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - run: go test ./...
+      - name: Build
+        run: |
+          version=${GITHUB_REF_NAME#v}
+          mkdir -p out
+          for t in darwin/arm64 darwin/amd64 linux/amd64 linux/arm64 windows/amd64 windows/arm64; do
+            os=${t%/*}; arch=${t#*/}; ext=""; [ "$os" = windows ] && ext=.exe
+            GOOS=$os GOARCH=$arch CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -X main.version=$version" -o "out/vikey-$os-$arch$ext" ./cmd/vikey
+          done
+          cp bootstrap/install.sh bootstrap/install.ps1 out/
+          cd out
+          sha256sum vikey-* install.sh install.ps1 > checksums.txt
+          python3 - "$version" <<'PY'
+          import json, sys
+          version = sys.argv[1]
+          assets = {}
+          for line in open("checksums.txt"):
+              sha, name = line.split()
+              if name.startswith("vikey-"):
+                  assets[name[len("vikey-"):].removesuffix(".exe")] = sha
+          json.dump({
+              "version": version,
+              "downloadBase": "https://github.com/" + "${{ github.repository }}" + "/releases/download/v{version}",
+              "assets": assets,
+          }, open("release.json", "w"), indent=2)
+          PY
+          cat checksums.txt release.json
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" out/* --title "$GITHUB_REF_NAME" --generate-notes
