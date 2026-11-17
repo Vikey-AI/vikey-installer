@@ -53,7 +53,7 @@ func main() {
 	addr := flag.String("addr", ":8080", "listen address")
 	dl := flag.String("dl", "", "folder served at /dl/ (CLI binaries for the bootstrap script)")
 	bootstrap := flag.String("bootstrap", "", "folder with install.sh and install.ps1 templates")
-	code := flag.String("code", "E2ETEST1", "the one install code this server accepts")
+	code := flag.String("code", "E2ETEST1ABCD", "the one install code this server accepts")
 	plan := flag.Bool("plan", false, "offer a Token Plan profile too")
 	flag.Parse()
 	self := "http://" + *addr

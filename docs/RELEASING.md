@@ -57,7 +57,7 @@ The scripts in `bootstrap/` run in people's shells straight from a pipe:
 ```bash
 go build -o dist/vikey-darwin-arm64 ./cmd/vikey
 go run ./tools/mockapi -addr 127.0.0.1:18080 -dl dist -bootstrap bootstrap
-curl -fsSL http://127.0.0.1:18080/i/E2ETEST1 | VIKEY_SETUP_ARGS="--yes --no-install" HOME=/tmp/vikey-home sh
+curl -fsSL http://127.0.0.1:18080/i/E2ETEST1ABCD | VIKEY_SETUP_ARGS="--yes --no-install" HOME=/tmp/vikey-home sh
 ```
 
 Use a throwaway `HOME` as above so your own agent settings stay untouched.

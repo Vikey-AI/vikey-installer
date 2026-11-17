@@ -285,7 +285,19 @@ func chooseAgents(ctx context.Context, all []agents.Agent, found map[string]agen
 	return out, nil
 }
 
-var codeRe = regexp.MustCompile(`(?i)(?:/i/)?\b([0-9A-HJKMNP-TV-Z]{8})\b`)
+// Install codes are Crockford base32: 12 characters since panel 2026-11-18,
+// 8 before. Up to 16 is accepted so a longer code later needs no new CLI.
+var codeRe = regexp.MustCompile(`(?i)(?:/i/)?\b([0-9A-HJKMNP-TV-Z]{8,16})\b`)
+
+// parseCode finds the install code in what the person typed or pasted: the
+// bare code, or the whole command or URL from the dashboard.
+func parseCode(s string) (string, bool) {
+	m := codeRe.FindStringSubmatch(strings.TrimSpace(s))
+	if m == nil {
+		return "", false
+	}
+	return strings.ToUpper(m[1]), true
+}
 
 // credentials trades the one-time code for the key, or reuses the key saved
 // by an earlier setup when no code was given.
@@ -318,10 +330,10 @@ func credentials(ctx context.Context, f setupFlags, interactive bool) (*state.Cr
 		input, err := ui.Input(
 			"Tempel kode pemasangan",
 			"Ada di dashboard Vikey, halaman API Key, tombol Pasang ke coding agent.",
-			"contoh K7QX9P2M",
+			"contoh K7QX9P2MAB4Z",
 			func(s string) error {
-				if codeRe.FindStringSubmatch(strings.TrimSpace(s)) == nil {
-					return errors.New("kode terdiri dari 8 huruf dan angka")
+				if _, ok := parseCode(s); !ok {
+					return errors.New("kode terdiri dari 12 huruf dan angka")
 				}
 				return nil
 			},
@@ -331,13 +343,13 @@ func credentials(ctx context.Context, f setupFlags, interactive bool) (*state.Cr
 		}
 		code = input
 	}
-	m := codeRe.FindStringSubmatch(code)
-	if m == nil {
-		return nil, errors.New("kode pemasangan tidak dikenali. Kode terdiri dari 8 huruf dan angka")
+	parsed, ok := parseCode(code)
+	if !ok {
+		return nil, errors.New("kode pemasangan tidak dikenali. Kode terdiri dari 12 huruf dan angka")
 	}
 
 	ui.Step("Menghubungkan ke Vikey")
-	inst, err := panel.Exchange(ctx, f.panelURL, strings.ToUpper(m[1]), version)
+	inst, err := panel.Exchange(ctx, f.panelURL, parsed, version)
 	if err != nil {
 		return nil, err
 	}

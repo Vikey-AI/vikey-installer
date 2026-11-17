@@ -71,14 +71,14 @@ jobs:
         shell: bash
         run: |
           nohup e2e/mockapi -addr 127.0.0.1:18080 -dl e2e/dl -bootstrap bootstrap > e2e/mock.log 2>&1 &
-          for i in $(seq 1 30); do curl -sf http://127.0.0.1:18080/i/E2ETEST1 >/dev/null && break; sleep 1; done
+          for i in $(seq 1 30); do curl -sf http://127.0.0.1:18080/i/E2ETEST1ABCD >/dev/null && break; sleep 1; done
 
       - name: One-line install (macOS, Linux)
         if: runner.os != 'Windows'
         shell: bash
         env:
           VIKEY_SETUP_ARGS: --yes --tools all
-        run: curl -fsSL http://127.0.0.1:18080/i/E2ETEST1 | sh 2>&1 | tee e2e/install.log
+        run: curl -fsSL http://127.0.0.1:18080/i/E2ETEST1ABCD | sh 2>&1 | tee e2e/install.log
 
       # Windows PowerShell 5.1, what most people have.
       - name: One-line install (Windows)
@@ -93,7 +93,7 @@ jobs:
           $code = 1
           $out = ''
           try {
-            $out = irm http://127.0.0.1:18080/i/E2ETEST1.ps1 | iex *>&1 | Out-String
+            $out = irm http://127.0.0.1:18080/i/E2ETEST1ABCD.ps1 | iex *>&1 | Out-String
             $code = $LASTEXITCODE
           } catch {
             $out += "`nEXCEPTION: $($_ | Out-String)"
