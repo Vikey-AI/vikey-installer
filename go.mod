@@ -1,4 +1,4 @@
-module github.com/vikey-ai/vikey-cli
+module github.com/Vikey-AI/vikey-installer
 
 go 1.27.4
 

@@ -8,7 +8,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/vikey-ai/vikey-cli/internal/edit"
+	"github.com/Vikey-AI/vikey-installer/internal/edit"
 )
 
 const (

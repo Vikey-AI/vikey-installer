@@ -8,8 +8,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/vikey-ai/vikey-cli/internal/edit"
-	"github.com/vikey-ai/vikey-cli/internal/state"
+	"github.com/Vikey-AI/vikey-installer/internal/edit"
+	"github.com/Vikey-AI/vikey-installer/internal/state"
 )
 
 // Claude is Claude Code. Its user settings file (~/.claude/settings.json) is

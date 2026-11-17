@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/vikey-ai/vikey-cli/internal/ui"
+	"github.com/Vikey-AI/vikey-installer/internal/ui"
 )
 
 // version is set at build time with -ldflags "-X main.version=1.2.3".

@@ -9,9 +9,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/vikey-ai/vikey-cli/internal/edit"
-	"github.com/vikey-ai/vikey-cli/internal/panel"
-	"github.com/vikey-ai/vikey-cli/internal/state"
+	"github.com/Vikey-AI/vikey-installer/internal/edit"
+	"github.com/Vikey-AI/vikey-installer/internal/panel"
+	"github.com/Vikey-AI/vikey-installer/internal/state"
 )
 
 func sandbox(t *testing.T) string {

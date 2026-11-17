@@ -20,7 +20,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/vikey-ai/vikey-cli/internal/agents"
+	"github.com/Vikey-AI/vikey-installer/internal/agents"
 )
 
 type oneShot struct {

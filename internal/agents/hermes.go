@@ -12,8 +12,8 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/vikey-ai/vikey-cli/internal/edit"
-	"github.com/vikey-ai/vikey-cli/internal/state"
+	"github.com/Vikey-AI/vikey-installer/internal/edit"
+	"github.com/Vikey-AI/vikey-installer/internal/state"
 )
 
 // Hermes is Hermes Agent. The CLI and Hermes Desktop share one data folder,

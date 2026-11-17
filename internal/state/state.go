@@ -14,8 +14,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/vikey-ai/vikey-cli/internal/edit"
-	"github.com/vikey-ai/vikey-cli/internal/panel"
+	"github.com/Vikey-AI/vikey-installer/internal/edit"
+	"github.com/Vikey-AI/vikey-installer/internal/panel"
 )
 
 // Dir is ~/.vikey, or VIKEY_HOME when set (used by the tests).

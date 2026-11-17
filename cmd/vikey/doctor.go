@@ -9,10 +9,10 @@ import (
 	"os/signal"
 	"strings"
 
-	"github.com/vikey-ai/vikey-cli/internal/agents"
-	"github.com/vikey-ai/vikey-cli/internal/panel"
-	"github.com/vikey-ai/vikey-cli/internal/state"
-	"github.com/vikey-ai/vikey-cli/internal/ui"
+	"github.com/Vikey-AI/vikey-installer/internal/agents"
+	"github.com/Vikey-AI/vikey-installer/internal/panel"
+	"github.com/Vikey-AI/vikey-installer/internal/state"
+	"github.com/Vikey-AI/vikey-installer/internal/ui"
 )
 
 func cmdDoctor(args []string) error {

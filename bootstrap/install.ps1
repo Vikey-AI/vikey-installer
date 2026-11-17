@@ -2,7 +2,7 @@
 # Downloads the vikey CLI, checks its SHA-256, then starts the setup with a
 # one-time code. The code works once and expires after 15 minutes. Your API
 # key is never part of this script.
-# Source: https://github.com/Vikey-AI/vikey-cli
+# Source: https://github.com/Vikey-AI/vikey-installer
 #
 # Runs through "irm ... | iex", so everything sits in a script block: no
 # variable or preference leaks into your PowerShell session, and the window

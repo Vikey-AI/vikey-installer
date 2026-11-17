@@ -14,8 +14,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/vikey-ai/vikey-cli/internal/panel"
-	"github.com/vikey-ai/vikey-cli/internal/state"
+	"github.com/Vikey-AI/vikey-installer/internal/panel"
+	"github.com/Vikey-AI/vikey-installer/internal/state"
 )
 
 // Detection is what was found on this machine.

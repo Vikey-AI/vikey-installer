@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/vikey-ai/vikey-cli/internal/edit"
-	"github.com/vikey-ai/vikey-cli/internal/state"
+	"github.com/Vikey-AI/vikey-installer/internal/edit"
+	"github.com/Vikey-AI/vikey-installer/internal/state"
 )
 
 // OpenCode is opencode. It uses the "provider" config format, which both
