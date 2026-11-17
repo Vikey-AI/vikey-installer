@@ -65,6 +65,11 @@ __ASSET_HASH__
     return
   }
 
+  # From here on errors belong to vikey.exe and the installers it runs. With
+  # 'Stop', Windows PowerShell 5.1 turns any line they write to stderr into a
+  # terminating error whenever the output is captured.
+  $ErrorActionPreference = 'Continue'
+
   # VIKEY_SETUP_ARGS adds flags, for example "--yes --tools claude,codex" in CI.
   $extra = @()
   if ($env:VIKEY_SETUP_ARGS) { $extra = @($env:VIKEY_SETUP_ARGS -split '\s+' | Where-Object { $_ }) }

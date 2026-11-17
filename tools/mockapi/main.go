@@ -75,7 +75,11 @@ func main() {
 		w.WriteHeader(http.StatusNoContent)
 	})
 	if *dl != "" {
-		mux.Handle("/dl/", http.StripPrefix("/dl/", http.FileServer(http.Dir(*dl))))
+		files := http.StripPrefix("/dl/", http.FileServer(http.Dir(*dl)))
+		mux.HandleFunc("/dl/", func(w http.ResponseWriter, r *http.Request) {
+			log.Printf("download %s (%s)", r.URL.Path, r.Header.Get("User-Agent"))
+			files.ServeHTTP(w, r)
+		})
 	}
 	if *bootstrap != "" {
 		mux.HandleFunc("/i/", func(w http.ResponseWriter, r *http.Request) {
@@ -260,6 +264,7 @@ var targets = []string{"darwin-arm64", "darwin-amd64", "linux-amd64", "linux-arm
 // serveBootstrap renders the templates the same way vikey-api's
 // utils/installCode.js does, with this server as panel and download host.
 func serveBootstrap(w http.ResponseWriter, r *http.Request, dir, dl, code, self string) {
+	log.Printf("bootstrap %s (%s)", r.URL.Path, r.Header.Get("User-Agent"))
 	name := strings.TrimPrefix(r.URL.Path, "/i/")
 	kind := "sh"
 	if strings.HasSuffix(name, ".ps1") {
@@ -314,6 +319,7 @@ func exchange(w http.ResponseWriter, r *http.Request, code, self string, plan bo
 		Code string `json:"code"`
 	}
 	_ = json.NewDecoder(r.Body).Decode(&body)
+	log.Printf("exchange code=%q (%s)", body.Code, r.Header.Get("User-Agent"))
 	if !strings.EqualFold(body.Code, code) {
 		writeJSON(w, http.StatusNotFound, map[string]any{"error": map[string]any{"message": "Kode pemasangan tidak berlaku.", "code": "invalid_code"}})
 		return

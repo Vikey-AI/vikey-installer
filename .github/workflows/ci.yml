@@ -87,10 +87,20 @@ jobs:
         env:
           VIKEY_SETUP_ARGS: --yes --tools all
         run: |
-          $out = irm http://127.0.0.1:18080/i/E2ETEST1.ps1 | iex *>&1 | Out-String
-          $code = $LASTEXITCODE
-          Write-Host $out
-          [IO.File]::WriteAllText("$PWD\e2e\install.log", $out)
+          # Actions starts this shell with 'Stop', which would end the capture
+          # at the first stderr line of an installer.
+          $ErrorActionPreference = 'Continue'
+          $code = 1
+          $out = ''
+          try {
+            $out = irm http://127.0.0.1:18080/i/E2ETEST1.ps1 | iex *>&1 | Out-String
+            $code = $LASTEXITCODE
+          } catch {
+            $out += "`nEXCEPTION: $($_ | Out-String)"
+          } finally {
+            Write-Host $out
+            [IO.File]::WriteAllText("$PWD\e2e\install.log", $out)
+          }
           if ($code -ne 0) { exit $code }
 
       - name: Agents answer through Vikey, doctor, uninstall
